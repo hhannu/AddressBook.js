@@ -1,0 +1,34 @@
+extends layout
+
+block content
+  div(class='container')
+    h3 #{user.name}
+    if hasAddresses  
+      div(data-role="collapsible-set")
+        each name in user.addresses          
+          div( data-role="collapsible")
+            h3 #{name.name}
+            table
+              tbody
+                tr
+                  td Address: 
+                  td #{name.address}        
+                tr
+                  td Email: 
+                  td #{name.email} 
+                tr
+                  td Phone: 
+                  td #{name.phone} 
+                tr
+                  td Birthday: 
+                  td #{name.birthday} 
+                tr
+                  td General info: 
+                  td #{name.info} 
+
+    else
+      p No addresses
+    br  
+    a(href="/add_new") Add new address
+    br  
+    a(href="/logout") Logout

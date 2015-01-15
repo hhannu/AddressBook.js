@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  div(class='container')
+    h1 Register
+
+    form(action="/register_user",method="post",data-ajax='false')
+      label Username
+      br
+      input(type="text",name="username",required)
+      br
+      label Password
+      br
+      input(type="password",name="password",required)
+      br
+      label Email address
+      br
+      input(type="email",name="email",required)
+      br
+      input(type="submit",value="Register")

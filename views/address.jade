@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  div(class='container')
+    h1 New Address
+    form(action="/save_address",method="post",data-ajax='false')
+      label Name
+      input(type="text",name="name",required)
+      br
+      label Address
+      input(type="text",name="address",required)
+      br
+      label Email
+      input(type="email",name="email")
+      br
+      label Phone number
+      input(type="text",name="phone")
+      br
+      label Birthday
+      input(type="date",name="birthday")
+      br
+      label General info
+      input(type="text",name="info")
+      br
+      input(type="submit",value="Save")

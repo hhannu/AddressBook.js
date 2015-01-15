@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  div(class='container')
+    h1 AddressBook login
+
+    form(action="/login",method="post",data-ajax='false')
+      label Username
+      input(type="text",name="username",required)
+      br
+      label Password
+      input(type="password",name="password",required)
+      br
+      input(type="submit",value="Login")
+
+    if error
+      br
+      p(id='error') #{error}
+    br
+    p Not registered yet?
+    a(href='/register') Register here
