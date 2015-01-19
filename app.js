@@ -9,7 +9,7 @@ var routes = require('./routes/index');
 
 var session = require('express-session');
 var app = express();
-app.use(session({secret:'xxx'}));
+app.use(session({secret:'b3625cc3-8d97-4f16-bd9a-c2ee979bb1e9', resave: false, saveUninitialized: true}));
 
 var db = require('./db');
 
@@ -31,6 +31,7 @@ app.post('/login', db.getUser);
 app.use('/names', db.getNames);
 app.use('/register_user', db.registerUser);
 app.use('/save_address', db.saveAddress);
+app.use('/remove', db.removeAddress);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

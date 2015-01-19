@@ -80,7 +80,7 @@ exports.registerUser = function(req,res){
             res.render('error', {message:'prkl', error:err});
         else {
             req.session.login = true;
-            req.session.id = temp._id;
+            req.session.name = temp.name;
             res.render('names', {user:temp, hasAddresses:temp.addresses.length ===  0 ? false : true});
 //            res.status(301);
 //            res.setHeader('location', 'http://127.0.0.1:3000');
@@ -99,17 +99,47 @@ exports.saveAddress = function(req,res){
             if(data.length > 0) {                   
                 var data = data[0];
                 
-                var address = {name: req.body.name, address: req.body.address,
+                var address = {id: data.addresses.length, name: req.body.name, address: req.body.address,
                                email: req.body.email, phone: req.body.phone,
                                birthday: req.body.birthday, info: req.body.info};
                 data.addresses.push(address);
                 console.log(data);
-                User.update(data, function(){});
-                res.render('names', {user:data, hasAddresses:data.addresses.length ===  0 ? false : true}); 
+                data.save(function(err){
+                    if(err){
+                        res.render('error', {message:'Failed to save address', error:err});}
+                    else
+                        res.render('names', {user:data, hasAddresses:data.addresses.length ===  0 ? false : true}); 
+                });
             }    
             else { 
-                res.render('error', {message:'error', error:{}});
+                res.render('error', {message:'Database error', error:{}});
             }
         });
     } 
+}
+
+exports.removeAddress = function(req,res){
+    if(typeof req.session.name == 'undefined') res.redirect('/');
+    else {
+        User.find(req.session.name, function(err,data){
+            if(err)
+                res.render('error', {message:'Failed', error:err});
+            if(data.length > 0) {                   
+                var data = data[0];
+                var id = req.query.id;
+                if(typeof id != 'undefined' && id > 0 && id < data.addresses.length) {
+                    data.addresses.splice(id, 1);
+                    data.save(function(err){
+                        if(err){
+                            res.render('error', {message:'Failed to remove address', error:err});}
+                        else
+                            res.render('names', {user:data, hasAddresses:data.addresses.length ===  0 ? false : true}); 
+                    });
+                }                
+            }    
+            else { 
+                res.render('error', {message:'Database error', error:{}});
+            }
+        }); 
+    }
 }
