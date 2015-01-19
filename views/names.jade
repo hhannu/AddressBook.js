@@ -5,7 +5,7 @@ block content
     h3 #{user.name}
     if hasAddresses  
       div(data-role="collapsible-set")
-        each name in user.addresses          
+        each name, index in user.addresses          
           div( data-role="collapsible")
             h3 #{name.name}
             table
@@ -28,7 +28,7 @@ block content
                 tr
                   td 
                   td 
-                    a(href='/remove?id=#{name.id}') Remove address
+                    a(href='/remove?index=#{index}') Remove address
     else
       p No addresses
     br  

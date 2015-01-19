@@ -32,8 +32,7 @@ router.get('/add_new', function(req, res) {
 /* GET logout. */
 router.get('/logout', function(req, res) {
     if(req.session.login === true){
-        delete req.session.login;
-        delete req.session.name;
+        req.session.destroy(function(err){});
     }
     res.redirect('/');
 });

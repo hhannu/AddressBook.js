@@ -21,13 +21,13 @@ var User = mongoose.model("User", user);
 
 
 exports.getUser = function(req,res){
-    if(typeof req.session.login == 'undefined'){
+    if(typeof req.session.login == 'undefined') {
         var username = req.body.username;
         var password = req.body.password;
         User.find({name: username, password: password}, function(err,data){
             console.log(data);
             if(err)
-                res.render('error', {message:'Failed', error:err});
+                res.render('error', {message:'Error', error:err});
             if(data.length > 0) {   // Found user in database                   
                 var data = data[0];
                 req.session.login = true;
@@ -48,17 +48,17 @@ exports.getUser = function(req,res){
 }
 
 exports.getNames = function(req,res){
-    if (typeof req.session.name == 'undefined') res.redirect('/');
+    if(typeof req.session.name == 'undefined') res.redirect('/');
     else {
         User.find(req.session.name, function(err,data){
             if(err)
-                res.render('error', {message:'Failed', error:err});
+                res.render('error', {message:'Error', error:err});
             if(data.length > 0) {                   
                 var data = data[0];
-                res.render('names', {user:data}); 
+                res.render('names', {user:data, hasAddresses:data.addresses.length ===  0 ? false : true}); 
             }    
             else { 
-                res.render('error', {message:'error', error:{}});
+                res.render('error', {message:'Database error', error:{}});
             }
         }); 
     }
@@ -66,22 +66,22 @@ exports.getNames = function(req,res){
 
 exports.registerUser = function(req,res){  
         
-    var temp = new User({
+    var new_user = new User({
         name:req.body.username,
         password:req.body.password,
         email:req.body.email,
         addresses:[]
     });
 
-    console.log(temp);
+    console.log(new_user);
   
-    temp.save(function(err){
+    new_user.save(function(err){
         if(err)
-            res.render('error', {message:'prkl', error:err});
+            res.render('error', {message:'Failed to add user', error:err});
         else {
             req.session.login = true;
-            req.session.name = temp.name;
-            res.render('names', {user:temp, hasAddresses:temp.addresses.length ===  0 ? false : true});
+            req.session.name = new_user.name;
+            res.render('names', {user:new_user, hasAddresses:new_user.addresses.length ===  0 ? false : true});
 //            res.status(301);
 //            res.setHeader('location', 'http://127.0.0.1:3000');
 //            res.send();
@@ -92,14 +92,14 @@ exports.registerUser = function(req,res){
 exports.saveAddress = function(req,res){
     console.log(req.body);
     if(typeof req.session.login == 'undefined') res.redirect('/');
-    else{
+    else {
         User.find({name: req.session.name}, function(err,data){
             if(err)
-                res.render('error', {message:'Failed', error:err});
+                res.render('error', {message:'Error', error:err});
             if(data.length > 0) {                   
                 var data = data[0];
                 
-                var address = {id: data.addresses.length, name: req.body.name, address: req.body.address,
+                var address = {name: req.body.name, address: req.body.address,
                                email: req.body.email, phone: req.body.phone,
                                birthday: req.body.birthday, info: req.body.info};
                 data.addresses.push(address);
@@ -121,14 +121,18 @@ exports.saveAddress = function(req,res){
 exports.removeAddress = function(req,res){
     if(typeof req.session.name == 'undefined') res.redirect('/');
     else {
-        User.find(req.session.name, function(err,data){
+        User.find({name: req.session.name}, function(err,data){
             if(err)
-                res.render('error', {message:'Failed', error:err});
-            if(data.length > 0) {                   
+                res.render('error', {message:'Error', error:err});
+            if(data.length > 0) {       
+                console.log('removeAddress() ' + data);            
                 var data = data[0];
-                var id = req.query.id;
-                if(typeof id != 'undefined' && id > 0 && id < data.addresses.length) {
-                    data.addresses.splice(id, 1);
+                var index = req.query.index;
+                if(typeof index != 'undefined' && index >= 0 && index < data.addresses.length) {
+                    if(data.addresses.length === 1)
+                        data.addresses.pop();
+                    else
+                        data.addresses.splice(index, 1);
                     data.save(function(err){
                         if(err){
                             res.render('error', {message:'Failed to remove address', error:err});}
